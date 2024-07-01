@@ -1,9 +1,11 @@
 import { existsSync, readdir, realpathSync, rename } from "fs";
 import { PdfExtractor } from "pdf-extractor";
 import { unlink } from 'fs';
-import { getArquivoDb, getArquivosDb, getTagsDb, postArquivoDb, putArquivoDb } from '../data/arquivos.db.js';
+import { getArquivoDb, getArquivoPath, getArquivosDb, getTagsDb, postArquivoDb, putArquivoDb } from '../data/arquivos.db.js';
 
-export function pdfService(pdf) {
+export async function pdfService(id) {
+  const data = await getArquivoPath(id);
+  const { pdf } = data
   const resultadoBusca = { path: `uploads/${pdf}`, status: 404 };
 
   if (existsSync(resultadoBusca.path)) {

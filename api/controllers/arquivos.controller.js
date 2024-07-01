@@ -12,8 +12,8 @@ import {
 
 export async function getPdf(req, res) {
   try {
-    const { pdf } = req.query;
-    const { path, status } = pdfService(pdf);
+    const { id } = req.params;
+    const { path, status } = pdfService(id);
     if (status === 200) {
       res.type('application/pdf');
       res.sendFile(path);

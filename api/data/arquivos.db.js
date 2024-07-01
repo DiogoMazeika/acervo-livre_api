@@ -1,5 +1,18 @@
 import { conn } from "../../server.js";
 
+export async function getArquivoPath(id) {
+  const [rows] = await conn.query(
+    `
+    select
+      arquivo_path as pdf
+    from arquivos
+    where id = ?
+    `, [id]
+  );
+
+  return rows[0];
+}
+
 export async function getArquivosDb() {
   const [rows] = await conn.query(
     'select * from arquivos'
