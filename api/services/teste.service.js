@@ -1,5 +1,5 @@
 import data from '../data/teste.db.js';
 
-export function testeService(){
-    return data;
+export async function testeService(){
+    return await data();
 }

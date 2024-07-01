@@ -1,45 +1,78 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import session from 'express-session';
-import cookieParser from 'cookie-parser';
-import pg from 'pg';
 import { readdir } from 'fs';
+import multer from 'multer';
+import mysql from 'mysql2/promise';
+import config from './config/default.js';
+import database from './env.js';
 
-// import { port } from './config/default.json';
-const port = 8080;
+export const conn = await mysql.createConnection(database);
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      `${Date.now()}_${file.originalname.replace(
+        /[^A-Z0-9_-\s()!@#$&.,]/gi,
+        '_'
+      )}`
+    );
+  },
+});
+export const upload = multer({ storage });
+
+const {
+  server: { port },
+} = config;
 const app = express();
-
-/* const pool = new pg.Pool({
-  user: 'seu_usuario',
-  host: 'localhost',
-  database: 'seu_banco_de_dados',
-  password: 'sua_senha',
-  port: 5432,
-}); */
 
 app.use(
   session({
     secret: 'my-secret', // a secret string used to sign the session ID cookie
-    resave: false, // don't save session if unmodified
+    resave: false, // don't save session if unmodified // TODO: comolidar?
     saveUninitialized: false, // don't create session until something stored
     cookie: {
-      maxAge: 1000,
+      maxAge: 1000 * 60,
     },
   })
 );
 
-/* app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(
-  session({
-    secret: 'secret',
-    resave: true,
-    saveUninitialized: true,
+  express.urlencoded({
+    extended: true,
   })
-); */
+);
+
+// Add headers before the routes are defined
+app.use(function (req, res, next) {
+  // Website you wish to allow to connect
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+
+  // Request methods you wish to allow
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET, POST, OPTIONS, PUT, DELETE'
+  );
+
+  // Request headers you wish to allow
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-Requested-With,content-type'
+  );
+
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  // Pass to next layer of middleware
+  next();
+});
 
 app.get('/', (req, res) => {
-  if (req.session.views) {
+  /* if (req.session.views) {
     req.session.views++;
     res.setHeader('Content-Type', 'text/html');
     res.write('<p>views: ' + req.session.views + '</p>');
@@ -48,8 +81,8 @@ app.get('/', (req, res) => {
   } else {
     req.session.views = 1;
     res.end('welcome to the session demo. refresh!');
-  }
-  //   return res.send('funciona!');
+  } */
+  return res.send('funciona!');
 });
 
 readdir('./api/routes', async (err, files) => {
