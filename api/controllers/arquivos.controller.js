@@ -7,13 +7,13 @@ import {
   putArquivoService,
   createThumbnailService,
   deleteFileService,
-  pdfService
+  pdfService,
 } from '../services/arquivos.service.js';
 
 export async function getPdf(req, res) {
   try {
     const { id } = req.params;
-    const { path, status } = pdfService(id);
+    const { path, status } = await pdfService(id);
     if (status === 200) {
       res.type('application/pdf');
       res.sendFile(path);
@@ -27,10 +27,10 @@ export async function getPdf(req, res) {
 
 export async function thumbnail(req, res) {
   try {
-    const { id } = req.params;
-    const { path, status } = thumbnailService(id);
+    const { cd } = req.params;
+    const { path, status } = thumbnailService(cd);
     if (status === 200) {
-      res.type("jpg");
+      res.type('jpg');
       res.sendFile(path);
     } else {
       res.sendStatus(status);
@@ -73,8 +73,8 @@ export async function getTags(req, res) {
 
 export async function putArquivo(req, res) {
   try {
-    const { nome, id } = req.body;
-    await putArquivoService(nome, id);
+    const { nome, file, tags, id } = req.body;
+    await putArquivoService(id, nome, tags, file);
     res.sendStatus(200);
   } catch (e) {
     console.debug(e);
@@ -84,8 +84,8 @@ export async function putArquivo(req, res) {
 
 export async function postArquivo(req, res) {
   try {
-    const { nome, arquivo } = req.body;
-    const id = await postArquivoService(nome, arquivo);
+    const { nome, file, tags } = req.body;
+    const id = await postArquivoService(nome, tags, file);
     res.json({ id });
   } catch (e) {
     console.debug(e);
@@ -96,9 +96,9 @@ export async function postArquivo(req, res) {
 export async function uploadFile(req, res) {
   try {
     const { file } = res.req;
-    const [id] = file.filename.split(/_(.+)/);
-    await createThumbnailService(file.filename, id);
-    res.send({ file: file.filename, id });
+    const [cd] = file.filename.split(/_(.+)/);
+    await createThumbnailService(file.filename, cd);
+    res.send({ path: file.filename, cd });
   } catch (e) {
     res.sendStatus(500); // 418 🍵
   }

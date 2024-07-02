@@ -2,9 +2,19 @@ import { Router } from 'express';
 const router = Router();
 import { upload } from '../../server.js';
 
-import { deleteFile, getArquivo, getArquivos, getPdf, getTags, postArquivo, putArquivo, thumbnail, uploadFile } from '../controllers/arquivos.controller.js';
+import {
+  deleteFile,
+  getArquivo,
+  getArquivos,
+  getPdf,
+  getTags,
+  postArquivo,
+  putArquivo,
+  thumbnail,
+  uploadFile,
+} from '../controllers/arquivos.controller.js';
 
-router.get('/thumbnail/:id', thumbnail);
+router.get('/thumbnail/:cd', thumbnail);
 router.get('/pdf/:id', getPdf);
 
 router.get('/arquivos', getArquivos);
