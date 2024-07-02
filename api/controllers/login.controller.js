@@ -2,9 +2,9 @@ import { loginService, postUsuarioService } from '../services/login.service.js';
 
 export async function postUsuario(req, res) {
   try {
-    const { nome, login, senha } = req.body;
+    const { nome, login, senha, senha2 } = req.body;
 
-    await postUsuarioService(nome, login, senha);
+    await postUsuarioService(nome, login, senha, senha2);
     res.sendStatus(200);
   } catch (e) {
     console.debug(e);

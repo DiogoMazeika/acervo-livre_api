@@ -15,9 +15,16 @@ export async function getArquivoPath(id) {
   return rows[0];
 }
 
-export async function getArquivosDb() {
+export async function getArquivosDb(usuarioId) {
   const [rows] = await conn.query(
-    'select id, nome, cd_path as cd from arquivos'
+    `
+    select
+      id,
+      nome,
+      cd_path as cd
+    from arquivos
+    where (usuario_criador = ? or ? is null)
+    `, [usuarioId, usuarioId]
   );
 
   return rows;
@@ -71,11 +78,22 @@ export async function postArquivoDb(nome, nomeOriginal, path, cdPath) {
       nome,
       nome_original,
       path,
-      cd_path
-    ) values (?, ?, ?, ?)
+      cd_path,
+      usuario_criador
+    ) values (?, ?, ?, ?, ?)
     `,
-    [nome, nomeOriginal, path, cdPath]
+    [nome, nomeOriginal, path, cdPath, 1]
   );
 
   return teste[0].insertId;
+}
+
+export async function postArquivoTagDb(arquivoId, tagId) {
+  await conn.query(
+    `
+    insert into arquivo_tag (arquivo_id, tag_id)
+    values (?, ?)
+    `,
+    [arquivoId, tagId]
+  );
 }

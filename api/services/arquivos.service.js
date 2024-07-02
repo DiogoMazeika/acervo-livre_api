@@ -7,6 +7,7 @@ import {
   getArquivosDb,
   getTagsDb,
   postArquivoDb,
+  postArquivoTagDb,
   putArquivoDb,
 } from '../data/arquivos.db.js';
 
@@ -20,7 +21,6 @@ export async function pdfService(id) {
     resultadoBusca.status = 200;
   }
 
-  console.debug(resultadoBusca);
   return resultadoBusca;
 }
 
@@ -40,11 +40,14 @@ export function thumbnailService(cd) {
 }
 
 export async function getArquivosService() {
-  return await getArquivosDb();
+  const arquivos = await getArquivosDb();
+  const arquivosUser = await getArquivosDb(1);
+
+  return { arquivos, arquivosUser };
 }
 
-export async function getArquivoService(id) {
-  const query = await getArquivoDb(id);
+export async function getArquivoService(arquivoId) {
+  const query = await getArquivoDb(arquivoId);
   const { id, nome, original, path, cd } = query[0];
   return { id, nome, file: { original, path, cd } };
 }
@@ -65,26 +68,29 @@ export async function putArquivoService(
 
   const promises = [];
 
-  if (Array.isArray(tags) && tags.length > 0) {
-    tags.forEach((t) => {
-      promises.push(t);
+  /* if (Array.isArray(tags) && tags.length > 0) {
+    tags.forEach(({ id: tagId }) => {
+      promises.push(postArquivoTagDb(id, tagId));
     });
   }
+
+  await Promise.all(promises); */
 
   return true;
 }
 
-export async function postArquivoService(nome, tags, { orginal, path, cd }) {
-  const id = await postArquivoDb(nome, orginal, path, cd);
+export async function postArquivoService(nome, tags, { original, path, cd }) {
+  const id = await postArquivoDb(nome, original, path, cd);
 
   const promises = [];
 
   if (Array.isArray(tags) && tags.length > 0) {
-    tags.forEach((t) => {
-      // { id, nome }
-      promises.push(t);
+    tags.forEach(({ id: tagId }) => {
+      promises.push(postArquivoTagDb(id, tagId));
     });
   }
+
+  await Promise.all(promises);
 
   return id;
 }

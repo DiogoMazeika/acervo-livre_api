@@ -4,9 +4,9 @@ import { readdir } from 'fs';
 import multer from 'multer';
 import mysql from 'mysql2/promise';
 import config from './config/default.js';
-import database from './env.js';
+import env from './env.js';
 
-export const conn = await mysql.createConnection(database);
+export const conn = await mysql.createConnection(env.database);
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {

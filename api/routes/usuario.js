@@ -6,13 +6,13 @@ import { info, login, postUsuario } from '../controllers/login.controller.js';
 router.post('/usuario', postUsuario);
 router.post('/login', login);
 
-router.use((req, res, next) => {
+/* router.use((req, res, next) => {
     if (req.session.login) {
       next();
     } else {
       res.sendStatus(401)
     }
-});
+}); */
 
 router.get('/info', info);
 
